@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="apidoc">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>API documentation</title>
+  <script language="JavaScript" src="underscore-min.js"></script>
+  <script language="JavaScript" src="angular/angular.min.js"></script>
+  <script language="JavaScript" src="angular/angular-ui-router.min.js"></script>
+  <script language="JavaScript" src="angular/select.min.js"></script>
+  <script language="JavaScript" src="angular/angular-sanitize.js"></script>
+  <script language="JavaScript" src="angular/ui-bootstrap-tpls-0.12.1.min.js"></script>
+  <script language="JavaScript" src="apidoc.js"></script>
+
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <style type="text/css">
+    .api-documentation {
+      border-bottom: 1px solid #ddd;
+      padding-left: 15px;
+      padding-right: 15px;
+    }
+    .http-result {
+      max-height: 600px;
+      width: 100%;
+      padding: 5px 10px;
+    }
+    .ui-match { background: yellow; }
+    .valign-bottom {
+      padding-top: 25px;
+    }
+  </style>
+</head>
+<body data-ng-controller="Loader">
+  <h1>API documentation</h1>
+  <form class="container-fluid">
+    <div class="row">
+      <div class="col-xs-6 form-group">
+        <label for="security">API Token</label>
+        <input type="TEXT" class="form-control" id="security" placeholder="required" data-ng-model="securityToken">
+      </div>
+      <div class="col-xs-5 form-group">
+        <label for="query">Filter by</label>
+        <input type="TEXT" class="form-control" id="query" data-ng-model="criteria">
+      </div>
+      <div class="col-xs-1 valign-bottom">
+        <button class="btn btn-default" ng-click="isShowSetupCollapsed = !isShowSetupCollapsed">
+          <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+    <div class="row" collapse="isShowSetupCollapsed">
+      <div class="col-xs-6"></div>
+      <div class="col-xs-6">
+        <div class="form-group">
+          <label class="checkbox-inline">
+            <input type="checkbox" data-ng-model="showSetup.filterByEndpointName">
+            Filter by endpoint name
+          </label>
+        </div>
+        <div class="form-group">
+          <label class="checkbox-inline">
+            <input type="checkbox" data-ng-model="showSetup.filterByMethodName">
+            Filter by method name
+          </label>
+        </div>
+        <div class="form-group">
+          <label class="checkbox-inline">
+            <input type="checkbox" data-ng-model="showSetup.filterByMethodDescription">
+            Filter by method description
+          </label>
+        </div>
+        <div class="form-group">
+          <label class="checkbox-inline">
+            <input type="checkbox" data-ng-model="showSetup.filterByParameterName">
+            Filter by parameter name
+          </label>
+        </div>
+        <div class="form-group">
+          <label class="checkbox-inline">
+            <input type="checkbox" data-ng-model="showSetup.filterByParameterDescription">
+            Filter by parameter description
+          </label>
+        </div>
+      </div>
+    </div>
+  </form>
+  <script type="text/ng-template" id="templateId.html">
+    This is the content of the template
+  </script>
+
+  <tabset class="api-documentation">
+    <tab heading="Forewords">
+      Few words before going down the rabbit hole.
+    </tab>
+
+    <tab data-ng-repeat="tab in apis | filter:apiMatch(criteria) | orderBy: 'name'" heading="{{tab.name}}" active="tab.active" disabled="tab.disabled">
+      <accordion close-others="false">
+        <accordion-group data-ng-repeat="endpoint in tab.data.endpoints | filter:endpointMatch(criteria) | orderBy: 'name'">
+          <accordion-heading>
+            <span data-ng-bind-html="endpoint.name | highlight:criteria"></span>
+          </accordion-heading>
+
+          <accordion close-others="false">
+            <accordion-group data-ng-repeat="method in endpoint.methods | filter:methodMatch(criteria, endpoint) | orderBy: 'MethodName'">
+              <accordion-heading>
+                <span data-ng-switch on="method.HTTPMethod">
+                  <button data-ng-switch-when="GET"    type="button" class="btn btn-primary">GET</button>
+                  <button data-ng-switch-when="PUT"    type="button" class="btn btn-warning">PUT</button>
+                  <button data-ng-switch-when="POST"   type="button" class="btn btn-success">POST</button>
+                  <button data-ng-switch-when="DELETE" type="button" class="btn btn-danger">DELETE</button>
+                  <button data-ng-switch-default       type="button" class="btn btn-default">{{method.HTTPMethod}}</button>
+                </span>
+                <span data-ng-bind-html="method.MethodName | highlight:criteria"></span>
+                <span class="text-muted">{{method.URI}}</span>
+              </accordion-heading>
+              <span data-ng-bind-html="method.Synopsis | highlight:criteria"></span>
+              <table class="table">
+                <tr>
+                  <th>Parameter</th>
+                  <th>Value</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                </tr>
+                <tr data-ng-repeat="param in method.parameters">
+                  <td data-ng-bind-html="param.Name | highlight:criteria"></td>
+                  <td>
+                    <select data-ng-if="param.Required != 'Y' && param.Type == 'enumerated'" data-ng-options="o as o for o in param.EnumeratedList" data-ng-model="param.value"></select>
+                    <input data-ng-if="param.Required == 'Y' && param.Type != 'enumerated'" name="{{param.Name}}" data-ng-model="param.value" placeholder="required">
+                    <input data-ng-if="param.Required != 'Y' && param.Type != 'enumerated'" name="{{param.Name}}" data-ng-model="param.value">
+                  </td>
+                  <td>{{param.Type}}</td>
+                  <td data-ng-bind-html="param.Description | highlight:criteria"></td>
+                </tr>
+                <tr>
+                  <td colspan="4">
+                    <form class="form-inline show-setup">
+                      <button class="btn btn-default" data-ng-click="runMethod(method)">Run</button>
+                      <a data-ng-click="clearResults(method)" data-ng-show="method.call">Clear Results</a>
+
+                      <div class="form-group">
+                        <label class="checkbox-inline"><input type="checkbox" data-ng-model="showSetup.showResponseCode"> Show Response Code</label>
+                      </div>
+                      <div class="form-group">
+                        <label class="checkbox-inline"><input type="checkbox" data-ng-model="showSetup.showHeaders"> Show Headers</label>
+                      </div>
+                      <div class="form-group checkbox">
+                        <label>
+                          <select data-ng-model="showSetup.codeSample" data-ng-options="o as o for o in showSetup.sampleTypes" data-ng-change="method.updateSample()"></select>
+                          Code Example
+                        </label>
+                      </div>
+                    </form>
+                  </td>
+                </tr>
+                <tr data-ng-show="method.call"><td colspan="4">Call</td></tr>
+                <tr data-ng-show="method.call"><td colspan="4">{{method.call.url}}</td></tr>
+                <tr data-ng-show="method.call && showSetup.showResponseCode"><td colspan="4">Response Code</td></tr>
+                <tr data-ng-show="method.call && showSetup.showResponseCode"><td colspan="4">{{method.call.status}}</td></tr>
+                <tr data-ng-show="method.call && showSetup.showHeaders"><td colspan="4">Response Headers</td></tr>
+                <tr data-ng-show="method.call && showSetup.showHeaders"><td colspan="4">
+                  <pre>{{method.call.headersPretty}}</pre>
+                </td></tr>
+                <tr data-ng-show="method.call"><td colspan="4">Response Body</td></tr>
+                <tr data-ng-show="method.call"><td colspan="4">
+                  <textarea rows="{{lineCount(method.call.dataPretty)}}" cols="80" class="http-result">{{method.call.dataPretty}}</textarea>
+                </td></tr>
+                <tr data-ng-show="method.call && showSetup.codeSample != ''"><td colspan="4">Code Sample</td></tr>
+                <tr data-ng-show="method.call && showSetup.codeSample != ''"><td colspan="4">
+                  <textarea rows="{{lineCount(method.codeSample)}}" cols="80" class="http-result">{{method.codeSample}}</textarea>
+                </td></tr>
+
+              </table>
+            </accordion-group>
+          </accordion>
+
+        </accordion-group>
+      </accordion>
+
+      <div style="display: none">{{tab.data}}</div>
+    </tab>
+  </tabset>
+
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="MainApp">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fixed header</title>
+  <script language="JavaScript" src="underscore-min.js"></script>
+  <script language="JavaScript" src="angular/angular.min.js"></script>
+  <script language="JavaScript" src="angular/angular-ui-router.min.js"></script>
+  <script language="JavaScript" src="angular/select.min.js"></script>
+  <script language="JavaScript" src="angular/ui-bootstrap-tpls-0.12.1.min.js"></script>
+  <script language="JavaScript" src="angular/fixed-header.js"></script>
+  <script language="JavaScript" src="fixed-header-app.js"></script>
+
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <!--<link rel="stylesheet" href="css/extra-tabs.css">-->
+  <style type="text/css">
+  </style>
+</head>
+<body data-ng-controller="MyController">
+  <table class="table" fixed-header table-height="500px">
+    <thead>
+      <tr>
+        <th>Head A</th>
+        <th>Head B</th>
+        <th>Head C</th>
+        <th>Head D</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr data-ng-repeat="item in lines">
+        <td>Row {{item}}, cell A</td>
+        <td>Row {{item}}, cell B</td>
+        <td>Row{{item}}, cell C</td>
+        <td>Row {{item}}, cell D</td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>
