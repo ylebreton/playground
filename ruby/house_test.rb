@@ -1,6 +1,6 @@
-require 'test/unit'
+require 'minitest/autorun'
 
-class HouseTest < Test::Unit::TestCase
+class HouseTest < Minitest::Test
   class House
     VERSE_MAPPING = [
         'the horse and the hound and the horn that belonged to',
@@ -46,7 +46,7 @@ class HouseTest < Test::Unit::TestCase
     end
   end
 
-  test "verses" do
+  def test_verses
     rhyme = House.new
 
     assert_equal rhyme.verse(1), "This is the house that Jack built.\n"
@@ -63,28 +63,28 @@ class HouseTest < Test::Unit::TestCase
     assert_equal rhyme.verse(12), "This is the horse and the hound and the horn that belonged to the farmer sowing his corn that kept the rooster that crowed in the morn that woke the priest all shaven and shorn that married the man all tattered and torn that kissed the maiden all forlorn that milked the cow with the crumpled horn that tossed the dog that worried the cat that killed the rat that ate the malt that lay in the house that Jack built.\n"
   end
   
-  test "doubler" do
+  def test_doubler
     rhyme = House.new([DoublerModifier.new])
 
     assert_equal rhyme.verse(1), "This is the house that Jack built the house that Jack built.\n"
     assert_equal rhyme.verse(2), "This is the malt that lay in the malt that lay in the house that Jack built the house that Jack built.\n"
   end
 
-  test "inverted" do
+  def test_inverted
     rhyme = House.new([InvertModifier.new])
 
     assert_equal rhyme.verse(1), "This is the horse and the hound and the horn that belonged to.\n"
     assert_equal rhyme.verse(2), "This is the farmer sowing his corn that kept the horse and the hound and the horn that belonged to.\n"
   end
 
-  test "multiple" do
+  def test_multiple
     rhyme = House.new([InvertModifier.new, DoublerModifier.new])
 
     assert_equal rhyme.verse(1), "This is the horse and the hound and the horn that belonged to the horse and the hound and the horn that belonged to.\n"
     assert_equal rhyme.verse(2), "This is the farmer sowing his corn that kept the farmer sowing his corn that kept the horse and the hound and the horn that belonged to the horse and the hound and the horn that belonged to.\n"
   end
 
-  test "recite" do
+  def test_recite
     rhyme = House.new
     expected = ""
     expected << "This is the house that Jack built.\n\n"

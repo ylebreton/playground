@@ -1,6 +1,6 @@
-require 'test/unit'
+require 'minitest/autorun'
 
-class SingletonTest < Test::Unit::TestCase
+class SingletonTest < Minitest::Test
   class SimpleLogger1
     class << self
       undef_method :new
@@ -53,14 +53,14 @@ class SingletonTest < Test::Unit::TestCase
     end
   end
 
-  test "version1" do
+  def test_version1
     SimpleLogger1.error("foo")
     SimpleLogger1.info("bar")
 
     assert_equal ["ERROR: foo", "INFO: bar"], SimpleLogger1.output
   end
 
-  test "version2" do
+  def test_version2
     logger = SimpleLogger2.instance
     logger.error("foo")
     SimpleLogger2.instance.info("bar")

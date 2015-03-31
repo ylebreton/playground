@@ -1,7 +1,7 @@
-require 'test/unit'
+require 'minitest/autorun'
 require 'observer'
 
-class ObserverTest < Test::Unit::TestCase
+class ObserverTest < Minitest::Test
   class Notifier
     attr_reader :notifications
 
@@ -31,7 +31,7 @@ class ObserverTest < Test::Unit::TestCase
     end
   end
 
-  test "test" do
+  def test_observer
     car = Car.new(2300, 3000)
     car.log(100)
     assert_equal ["The car has logged 100 miles, totaling 2400 miles traveled."], car.notifier.notifications

@@ -1,6 +1,6 @@
-require 'test/unit'
+require 'minitest/autorun'
 
-class CoinsTest < Test::Unit::TestCase
+class CoinsTest < Minitest::Test
   class Solution
     attr_accessor :fives, :threes
     def initialize(fives = 0, threes = 0)
@@ -54,21 +54,10 @@ class CoinsTest < Test::Unit::TestCase
   end
 
   def bestSolution(solutions)
-    best = solutions.sort {|a,b| a.number_coins <=> b.number_coins}[0]
-    puts best
-    best
+    solutions.sort {|a,b| a.number_coins <=> b.number_coins}[0]
   end
 
-  def setup
-    @initial = Time.now
-  end
-  def teardown
-    later = Time.now
-    span = Time.at(later - @initial).gmtime.strftime("%H:%M:%S %N")
-    puts "ran in:#{span}"
-  end
-
-  test "test recursion" do
+  def test_using_recursion
     assert_equal Solution.new(1, 1), bestSolution(coinsFinderRecursive(8))
     assert_equal Solution.new(1, 2), bestSolution(coinsFinderRecursive(11))
     assert_equal Solution.new(5, 2), bestSolution(coinsFinderRecursive(31))
@@ -76,7 +65,7 @@ class CoinsTest < Test::Unit::TestCase
     assert_equal Solution.new(1999998, 4), bestSolution(coinsFinderRecursive(10000002))
   end
 
-  test "test using loops" do
+  def test_using_loops
     assert_equal Solution.new(1, 1), bestSolution(coinsFinderLoop(8))
     assert_equal Solution.new(1, 2), bestSolution(coinsFinderLoop(11))
     assert_equal Solution.new(5, 2), bestSolution(coinsFinderLoop(31))

@@ -1,6 +1,6 @@
-require 'test/unit'
+require 'minitest/autorun'
 
-class BuilderTest < Test::Unit::TestCase
+class BuilderTest < Minitest::Test
   class BuilderTestHolder
     attr_accessor :first, :last, :age
     def initialize(&block) # this isn't really a builder since you can't evolve the object, but could be useful
@@ -32,7 +32,7 @@ class BuilderTest < Test::Unit::TestCase
     end
   end
 
-  test "defaults1" do
+  def test_defaults1
     holder = BuilderTestHolder.new
 
     assert_equal '', holder.first
@@ -40,7 +40,7 @@ class BuilderTest < Test::Unit::TestCase
     assert_equal 0, holder.age
   end
 
-  test "override1" do
+  def test_override1
     holder = BuilderTestHolder.new do
       self.age = 10
       self.first = 'foo'
@@ -52,15 +52,15 @@ class BuilderTest < Test::Unit::TestCase
     assert_equal 10, holder.age
   end
 
-  test "defaults2" do
-    holder = Builder2TestHolder.new
+  def test_defaults2
+    holder = Builder2TestHolder.new.build
 
     assert_equal '', holder.first
     assert_equal '', holder.last
     assert_equal 0, holder.age
   end
 
-  test "override2" do
+  def test_override2
     holder = Builder2TestHolder.new.withFirst('foo').withLast('bar').withAge(10).build
 
     assert_equal 'foo', holder.first

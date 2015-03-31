@@ -1,6 +1,6 @@
-require 'test/unit'
+require 'minitest/autorun'
 
-class FieldsTest < Test::Unit::TestCase
+class FieldsTest < Minitest::Test
   class FieldTestHolder
     class << self; attr_accessor :created; end
     attr_accessor :foo
@@ -11,7 +11,7 @@ class FieldsTest < Test::Unit::TestCase
 		end
   end
 
-  test "testy" do
+  def test_testy
   	one = FieldTestHolder.new
   	two = FieldTestHolder.new(10)
 
