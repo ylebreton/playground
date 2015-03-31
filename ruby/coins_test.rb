@@ -15,25 +15,29 @@ class CoinsTest < Test::Unit::TestCase
     def to_s #for display
       "#{fives} five cents, #{threes} three cents"
     end
-    def price
+    def value
       @fives * 5 + @threes * 3
     end
+
     def number_coins
       @fives + @threes
     end
   end
 
-  def coinsFinderRecursive(input, possible_solution = Solution.new, solutions = [])
-    total = possible_solution.price
+  def coinsFinderRecursive(input)
+    def coinsFinderRecursiveHelper(input, possible_solution, solutions) #hiding helper function since it has no value outside of coinsFinderRecursive it could also be made private
+      possible_solution.threes = (input - possible_solution.fives*5) / 3
 
-    if input > total
-      coinsFinderRecursive(input, Solution.new(possible_solution.fives, possible_solution.threes+1),
-           coinsFinderRecursive(input, Solution.new(possible_solution.fives+1, possible_solution.threes), solutions))
-    elsif input == total && !solutions.include?(possible_solution)
-      solutions << possible_solution
-    else
-      solutions
+      if possible_solution.fives < 0
+        solutions
+      elsif possible_solution.value == input
+        solutions << possible_solution
+      else
+        coinsFinderRecursiveHelper(input, Solution.new(possible_solution.fives - 1), solutions) #now this is a tail recursion
+      end
     end
+
+    coinsFinderRecursiveHelper(input, Solution.new(input/5), [])
   end
 
   def coinsFinderLoop(input)
@@ -41,7 +45,7 @@ class CoinsTest < Test::Unit::TestCase
     (input/5).downto 0 do |fives| #starting from the most fives as this is most likely the best solution
       solution = Solution.new(fives, (input - fives*5) / 3)
 
-      if solution.price == input
+      if solution.value == input
         solutions << solution
       end
     end
@@ -57,10 +61,8 @@ class CoinsTest < Test::Unit::TestCase
     assert_equal Solution.new(1, 1), bestSolution(coinsFinderRecursive(8))
     assert_equal Solution.new(1, 2), bestSolution(coinsFinderRecursive(11))
     assert_equal Solution.new(5, 2), bestSolution(coinsFinderRecursive(31))
-
-    #as expected the stack explodes if the number is too big
-    # assert_equal Solution.new(20, 0), bestSolution(coinsFinderRecursive(100))
-    # assert_equal Solution.new(1999998, 4), bestSolution(coinsFinderRecursive(10000002))
+    assert_equal Solution.new(20, 0), bestSolution(coinsFinderRecursive(100))
+    assert_equal Solution.new(1999998, 4), bestSolution(coinsFinderRecursive(10000002))
   end
 
   test "test using loops" do
