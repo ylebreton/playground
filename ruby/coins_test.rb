@@ -8,29 +8,29 @@ class CoinsTest < Test::Unit::TestCase
       @threes = threes
     end
 
-    def ==(other)
+    def ==(other) #to be compatible with array.include?
       other.threes == @threes && other.fives == @fives
     end
 
-    def to_s
+    def to_s #for display
       "#{fives} five cents, #{threes} three cents"
     end
-    def total
+    def price
       @fives * 5 + @threes * 3
     end
-    def coinSum
+    def number_coins
       @fives + @threes
     end
   end
 
-  def coinsFinderRecursive(input, possibleSolution = Solution.new, solutions = [])
-    total = possibleSolution.total
+  def coinsFinderRecursive(input, possible_solution = Solution.new, solutions = [])
+    total = possible_solution.price
 
     if input > total
-      coinsFinderRecursive(input, Solution.new(possibleSolution.fives, possibleSolution.threes+1),
-           coinsFinderRecursive(input, Solution.new(possibleSolution.fives+1, possibleSolution.threes), solutions))
-    elsif input == total && !solutions.include?(possibleSolution)
-      solutions << possibleSolution
+      coinsFinderRecursive(input, Solution.new(possible_solution.fives, possible_solution.threes+1),
+           coinsFinderRecursive(input, Solution.new(possible_solution.fives+1, possible_solution.threes), solutions))
+    elsif input == total && !solutions.include?(possible_solution)
+      solutions << possible_solution
     else
       solutions
     end
@@ -38,13 +38,13 @@ class CoinsTest < Test::Unit::TestCase
 
   def coinsFinderLoop(input)
     solutions = []
-    (input/5).downto 0 do |fives|
+    (input/5).downto 0 do |fives| #starting from the most fives as this is most likely the best solution
       for threes in 0..((input - fives*5) / 3) do
         solution = Solution.new(fives, threes)
-        if solution.total == input && !solutions.include?(solution)
+        if solution.price == input && !solutions.include?(solution)
           solutions << solution
         end
-        if solutions.length > 5
+        if solutions.length > 5 #to optimize am hoping that the best solution will be among the first few found
           break
         end
       end
@@ -54,7 +54,7 @@ class CoinsTest < Test::Unit::TestCase
   end
 
   def bestSolution(solutions)
-    solutions.sort {|a,b| a.coinSum <=> b.coinSum}[0]
+    solutions.sort {|a,b| a.number_coins <=> b.number_coins}[0]
   end
 
   test "test recursion" do
