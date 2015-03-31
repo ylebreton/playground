@@ -54,7 +54,18 @@ class CoinsTest < Test::Unit::TestCase
   end
 
   def bestSolution(solutions)
-    solutions.sort {|a,b| a.number_coins <=> b.number_coins}[0]
+    best = solutions.sort {|a,b| a.number_coins <=> b.number_coins}[0]
+    puts best
+    best
+  end
+
+  def setup
+    @initial = Time.now
+  end
+  def teardown
+    later = Time.now
+    span = Time.at(later - @initial).gmtime.strftime("%H:%M:%S %N")
+    puts "ran in:#{span}"
   end
 
   test "test recursion" do
