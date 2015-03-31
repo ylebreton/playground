@@ -39,14 +39,10 @@ class CoinsTest < Test::Unit::TestCase
   def coinsFinderLoop(input)
     solutions = []
     (input/5).downto 0 do |fives| #starting from the most fives as this is most likely the best solution
-      for threes in 0..((input - fives*5) / 3) do
-        solution = Solution.new(fives, threes)
-        if solution.price == input && !solutions.include?(solution)
-          solutions << solution
-        end
-        if solutions.length > 5 #to optimize am hoping that the best solution will be among the first few found
-          break
-        end
+      solution = Solution.new(fives, (input - fives*5) / 3)
+
+      if solution.price == input
+        solutions << solution
       end
     end
 
